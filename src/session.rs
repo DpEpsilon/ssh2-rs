@@ -134,12 +134,9 @@ impl<'sess> Session<'sess> {
     /// Begin transport layer protocol negotiation with the connected host.
     ///
     /// This session does *not* take ownership of the socket provided, it is
-    /// recommended to ensure that the socket persists the lifetime of this
-    /// session to ensure that communication is correctly performed.
-    ///
-    /// It is also highly recommended that the stream provided is not used
-    /// concurrently elsewhere for the duration of this session as it may
-    /// interfere with the protocol.
+    /// highly recommended that the stream provided is not used concurrently
+    /// elsewhere for the duration of this session as it may interfere with the
+    /// protocol.
     pub fn handshake(&mut self, stream: &'sess TcpStream) -> Result<(), Error> {
         unsafe {
             return self.rc(handshake(self.raw, stream));
