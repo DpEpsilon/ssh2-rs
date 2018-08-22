@@ -7,7 +7,7 @@ use util::SessionBinding;
 /// the remote server's port.
 pub struct Listener<'sess> {
     raw: *mut raw::LIBSSH2_LISTENER,
-    sess: &'sess Session,
+    sess: &'sess Session<'sess>,
 }
 
 impl<'sess> Listener<'sess> {

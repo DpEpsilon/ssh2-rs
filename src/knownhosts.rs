@@ -49,7 +49,7 @@ use util::{self, Binding, SessionBinding};
 /// ```
 pub struct KnownHosts<'sess> {
     raw: *mut raw::LIBSSH2_KNOWNHOSTS,
-    sess: &'sess Session,
+    sess: &'sess Session<'sess>,
 }
 
 /// Iterator over the hosts in a `KnownHosts` structure.
