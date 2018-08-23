@@ -7,6 +7,7 @@ use std::str;
 use libc::{self, c_uint, c_int, c_void, c_long};
 #[cfg(unix)]
 use libc::size_t;
+use std::marker::PhantomData;
 
 use {raw, Error, DisconnectCode, ByApplication, HostKeyType};
 use {MethodType, Agent, Channel, Listener, HashType, KnownHosts, Sftp};
@@ -17,18 +18,19 @@ use util::{self, Binding, SessionBinding};
 /// All other structures are based on an SSH session and cannot outlive a
 /// session. Sessions are created and then have the TCP socket handed to them
 /// (via the `handshake` method).
-pub struct Session {
+pub struct Session<'sess> {
     raw: *mut raw::LIBSSH2_SESSION,
+    phantom: PhantomData<&'sess ()>,
 }
 
-unsafe impl Send for Session {}
+unsafe impl<'sess> Send for Session<'sess> {}
 
 /// Metadata returned about a remote file when received via `scp`.
 pub struct ScpFileStat {
     stat: libc::stat,
 }
 
-impl Session {
+impl<'sess> Session<'sess> {
     /// Initializes an SSH session object.
     ///
     /// This function does not associate the session with a remote connection
@@ -36,7 +38,7 @@ impl Session {
     /// mode, compression, sigpipe, the banner, etc. To associate this session
     /// with a TCP connection, use the `handshake` method to pass in an
     /// already-established TCP socket.
-    pub fn new() -> Option<Session> {
+    pub fn new() -> Option<Session<'sess>> {
         ::init();
         unsafe {
             let ret = raw::libssh2_session_init_ex(None, None, None,
@@ -651,16 +653,16 @@ impl Session {
     }
 }
 
-impl Binding for Session {
+impl<'sess> Binding for Session<'sess> {
     type Raw = *mut raw::LIBSSH2_SESSION;
 
-    unsafe fn from_raw(raw: *mut raw::LIBSSH2_SESSION) -> Session {
-        Session { raw: raw }
+    unsafe fn from_raw(raw: *mut raw::LIBSSH2_SESSION) -> Session<'sess> {
+        Session { raw: raw, phantom: PhantomData }
     }
     fn raw(&self) -> *mut raw::LIBSSH2_SESSION { self.raw }
 }
 
-impl Drop for Session {
+impl<'sess> Drop for Session<'sess> {
     fn drop(&mut self) {
         unsafe {
             let _rc = raw::libssh2_session_free(self.raw);

@@ -11,7 +11,7 @@ use util::{Binding, SessionBinding};
 /// Agents can be used to authenticate a session.
 pub struct Agent<'sess> {
     raw: *mut raw::LIBSSH2_AGENT,
-    sess: &'sess Session,
+    sess: &'sess Session<'sess>,
 }
 
 /// An iterator over the identities found in an SSH agent.

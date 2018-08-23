@@ -17,7 +17,7 @@ use util::{Binding, SessionBinding};
 /// flag on a channel's corresponding `Session`.
 pub struct Channel<'sess> {
     raw: *mut raw::LIBSSH2_CHANNEL,
-    sess: &'sess Session,
+    sess: &'sess Session<'sess>,
     read_limit: Option<u64>,
 }
 
